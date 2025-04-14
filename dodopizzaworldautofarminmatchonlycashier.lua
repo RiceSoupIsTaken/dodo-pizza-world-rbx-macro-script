@@ -67,3 +67,19 @@ for i = 1, #placementData do
         upgradeTower:InvokeServer(i)
     end)
 end
+
+-- Constantly tries to vote for replay every 5 seconds
+task.spawn(function()
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local replayRemote = ReplicatedStorage:WaitForChild("ReplicatedStorage_Source")
+        :WaitForChild("Packages"):WaitForChild("Knit")
+        :WaitForChild("Services"):WaitForChild("TowerDefenceRunner")
+        :WaitForChild("RE"):WaitForChild("Vote")
+
+    while true do
+        pcall(function()
+            replayRemote:FireServer("Replay")
+        end)
+        wait(5)
+    end
+end)
