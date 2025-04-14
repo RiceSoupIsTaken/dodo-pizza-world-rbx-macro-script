@@ -67,3 +67,22 @@ for i = 1, #placementData do
         upgradeTower:InvokeServer(i)
     end)
 end
+
+-- Function to auto vote replay when button shows up
+local function autoVoteReplay()
+    local gui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+
+    gui.ChildAdded:Connect(function(child)
+        if child:IsA("ScreenGui") and child:FindFirstChild("Replay") then
+            print("Replay UI detected, voting now...")
+            pcall(function()
+                game:GetService("ReplicatedStorage"):WaitForChild("ReplicatedStorage_Source")
+                    :WaitForChild("Packages"):WaitForChild("Knit"):WaitForChild("Services")
+                    :WaitForChild("TowerDefenceRunner"):WaitForChild("RE")
+                    :WaitForChild("Vote"):FireServer("Replay")
+            end)
+        end
+    end)
+end
+
+autoVoteReplay()
