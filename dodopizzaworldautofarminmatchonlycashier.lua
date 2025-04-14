@@ -1,3 +1,75 @@
+-- Create the GUI
+local player = game:GetService("Players").LocalPlayer
+local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+screenGui.Name = "StepLoggerGUI"
+
+local frame = Instance.new("Frame", screenGui)
+frame.Size = UDim2.new(0, 300, 0, 400)
+frame.Position = UDim2.new(0, 10, 0, 100)
+frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+frame.BorderSizePixel = 0
+
+local uiList = Instance.new("UIListLayout", frame)
+uiList.SortOrder = Enum.SortOrder.LayoutOrder
+uiList.Padding = UDim.new(0, 4)
+
+-- Helper to add step labels
+local function addStep(stepText)
+    local label = Instance.new("TextLabel", frame)
+    label.Text = "🔄 " .. stepText
+    label.Size = UDim2.new(1, -10, 0, 22)
+    label.BackgroundTransparency = 1
+    label.TextColor3 = Color3.fromRGB(200, 200, 200)
+    label.Font = Enum.Font.SourceSans
+    label.TextSize = 18
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    return label
+end
+
+-- Steps list to reference later
+local steps = {}
+
+-- API to update steps
+local function updateStep(index, status)
+    if steps[index] then
+        if status == "done" then
+            steps[index].Text = "✅ " .. steps[index].Text:sub(3)
+            steps[index].TextColor3 = Color3.fromRGB(100, 255, 100)
+        elseif status == "error" then
+            steps[index].Text = "❌ " .. steps[index].Text:sub(3)
+            steps[index].TextColor3 = Color3.fromRGB(255, 100, 100)
+        elseif status == "current" then
+            steps[index].Text = "🔄 " .. steps[index].Text:sub(3)
+            steps[index].TextColor3 = Color3.fromRGB(200, 200, 0)
+        end
+    end
+end
+
+-- You can use this when running actions
+local function runStep(index, text, callback)
+    steps[index] = addStep(text)
+    updateStep(index, "current")
+    local success, err = pcall(callback)
+    if success then
+        updateStep(index, "done")
+    else
+        updateStep(index, "error")
+        warn("[Step " .. index .. " Error]:", err)
+    end
+end
+
+-- Example usage
+-- runStep(1, "Place Tower 1", function()
+--     -- do something
+--     wait(1)
+-- end)
+
+-- runStep(2, "Upgrade Tower 1", function()
+--     -- do something
+--     wait(1)
+-- end)
+
+
 -- Configs
 local placementCost = 300
 local upgradeCost = 400
